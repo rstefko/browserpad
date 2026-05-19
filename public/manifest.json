@@ -1,0 +1,25 @@
+{
+    "short_name": "Browserpad",
+    "name": "Browserpad",
+    "icons": [
+        {
+            "src": "./logo_192.png",
+            "sizes": "192x192",
+            "purpose": "any"
+        },
+        {
+            "src": "./logo_512.png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "./logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "start_url": "https://browserpad.online",
+    "display": "standalone",
+    "theme_color": "#e67e22",
+    "background_color": "#ffffff"
+}
