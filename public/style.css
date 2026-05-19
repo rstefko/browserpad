@@ -4,7 +4,7 @@ html, body {
 textarea {
   height: calc(100% - 2rem); box-sizing: border-box;
   border: none; outline: none; resize: none;
-  font-family: monospace;
+  font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 #textbox {
   border-right: 1px solid PaleTurquoise;
