@@ -30,6 +30,23 @@ nav {
 #controls {
   float: right;
 }
+#find-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+#find-query {
+  width: 12em;
+  max-width: 35vw;
+}
+#find-status {
+  min-width: 3.5em;
+  text-align: right;
+}
+#find-prev,
+#find-next {
+  text-decoration: none;
+}
 #save a {
   text-decoration: none;
 }
@@ -45,3 +62,10 @@ nav {
   font-weight: bold;
 }
 @media print { nav { display: none; } }
+
+@media screen and (max-width: 800px) {
+  #find-query {
+    width: 8em;
+    max-width: 45vw;
+  }
+}

@@ -1,6 +1,10 @@
 var textbox = document.querySelector('#textbox');
 var timeoutID = null;
 var filenameBox = document.querySelector('#filename');
+var findQueryBox = document.querySelector('#find-query');
+var findStatus = document.querySelector('#find-status');
+var findNext = document.querySelector('#find-next');
+var findPrev = document.querySelector('#find-prev');
 
 // Automatically load/save cache in local storage when opening and closing the page
 textbox.value = localStorage.getItem('browserpad') || '';
@@ -39,6 +43,114 @@ function updateCount(item, value) {
     document.querySelector('#' + item + '-count').textContent = value;
 }
 
+function getFindMatches() {
+    var query = findQueryBox.value;
+    var source = textbox.value;
+    var matches = [];
+
+    if (!query || !source) {
+        return matches;
+    }
+
+    var start = 0;
+    while (start <= source.length - query.length) {
+        var index = source.indexOf(query, start);
+        if (index === -1) {
+            break;
+        }
+        matches.push(index);
+        start = index + Math.max(1, query.length);
+    }
+
+    return matches;
+}
+
+function updateFindStatus(active, total) {
+    findStatus.textContent = active + '/' + total;
+}
+
+function selectFindResult(matches, index) {
+    var start = matches[index];
+    var end = start + findQueryBox.value.length;
+    textbox.focus();
+    textbox.setSelectionRange(start, end);
+    updateFindStatus(index + 1, matches.length);
+}
+
+function findFromCaret(forward) {
+    if (!findQueryBox.value) {
+        updateFindStatus(0, 0);
+        return;
+    }
+
+    var matches = getFindMatches();
+    if (!matches.length) {
+        updateFindStatus(0, 0);
+        return;
+    }
+
+    var caret = forward ? textbox.selectionEnd : textbox.selectionStart;
+    var targetIndex = -1;
+
+    if (forward) {
+        for (var i = 0; i < matches.length; i++) {
+            if (matches[i] > caret) {
+                targetIndex = i;
+                break;
+            }
+        }
+        if (targetIndex === -1) {
+            targetIndex = 0;
+        }
+    } else {
+        for (var j = matches.length - 1; j >= 0; j--) {
+            if (matches[j] < caret) {
+                targetIndex = j;
+                break;
+            }
+        }
+        if (targetIndex === -1) {
+            targetIndex = matches.length - 1;
+        }
+    }
+
+    selectFindResult(matches, targetIndex);
+}
+
+findQueryBox.addEventListener('input', function () {
+    var matches = getFindMatches();
+    updateFindStatus(0, matches.length);
+});
+
+findQueryBox.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        if (event.shiftKey) {
+            findPrev.click();
+        } else {
+            findNext.click();
+        }
+    }
+});
+
+findNext.onclick = function (event) {
+    event.preventDefault();
+    if (!findQueryBox.value) {
+        findQueryBox.focus();
+        return;
+    }
+    findFromCaret(true);
+};
+
+findPrev.onclick = function (event) {
+    event.preventDefault();
+    if (!findQueryBox.value) {
+        findQueryBox.focus();
+        return;
+    }
+    findFromCaret(false);
+};
+
 // Save textarea contents as a text file
 document.querySelector('#save a').onclick = function () {
     this.download = (filenameBox.value || 'browserpad.txt').replace(/^([^.]*)$/, "$1.txt");
@@ -55,6 +167,9 @@ document.querySelector('#open input').onchange = function () {
     reader.onload = function () {
         filenameBox.value = this.file.name;
         textbox.value = this.result; // this = FileReader object
+        calcStats();
+        var matches = getFindMatches();
+        updateFindStatus(0, matches.length);
     };
     reader.readAsText(this.files[0]); // this = input element
 };
@@ -79,9 +194,27 @@ document.querySelector("#print").onclick = function () {
     window.print();
 };
 
+window.addEventListener('keydown', function (event) {
+    if (event.key !== 'F3') {
+        return;
+    }
+
+    if (event.shiftKey) {
+        findPrev.click();
+    } else {
+        findNext.click();
+    }
+    event.preventDefault();
+}, true);
+
 // Keyboard shortcuts for the save and load functions (`Ctrl+S`, `Ctrl+O`)
 document.onkeydown = function (event) {
-    if (event.ctrlKey) {
+    if (event.ctrlKey || event.metaKey) {
+        if (event.key === "f") {
+            findQueryBox.focus();
+            findQueryBox.select();
+            event.preventDefault();
+        }
         if (event.key === "s") {
             document.querySelector('#save a').click();
             event.preventDefault();
@@ -97,3 +230,5 @@ document.onkeydown = function (event) {
 document.querySelector("#about-icon").onclick = function () {
     document.querySelector("#about").showModal();
 };
+
+updateFindStatus(0, getFindMatches().length);
