@@ -52,9 +52,12 @@ function getFindMatches() {
         return matches;
     }
 
+    // Case-insensitive search
+    var lowerQuery = query.toLowerCase();
+    var lowerSource = source.toLowerCase();
     var start = 0;
     while (start <= source.length - query.length) {
-        var index = source.indexOf(query, start);
+        var index = lowerSource.indexOf(lowerQuery, start);
         if (index === -1) {
             break;
         }
