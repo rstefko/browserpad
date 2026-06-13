@@ -19,8 +19,36 @@ textbox.onkeydown = function (event) {
     if (event.key === "Tab") {
         event.preventDefault();
         var text = this.value, s = this.selectionStart, e = this.selectionEnd;
-        this.value = text.substring(0, s) + '\t' + text.substring(e);
-        this.selectionStart = this.selectionEnd = s + 1;
+
+        if (s !== e) {
+            var lineStart = text.lastIndexOf('\n', s - 1) + 1;
+            var endAnchor = (e > 0 && text[e - 1] === '\n') ? e - 1 : e;
+            var lineEnd = text.indexOf('\n', endAnchor);
+            if (lineEnd === -1) {
+                lineEnd = text.length;
+            }
+
+            var selectedBlock = text.substring(lineStart, lineEnd);
+            if (event.shiftKey) {
+                var outdentedBlock = selectedBlock.replace(/^\t/gm, '');
+                var removedTabs = selectedBlock.length - outdentedBlock.length;
+                var removedBeforeStart = (selectedBlock.substring(0, s - lineStart).match(/^\t/gm) || []).length;
+
+                this.value = text.substring(0, lineStart) + outdentedBlock + text.substring(lineEnd);
+                this.selectionStart = s - removedBeforeStart;
+                this.selectionEnd = e - removedTabs;
+            } else {
+                var indentedBlock = selectedBlock.replace(/^/gm, '\t');
+                var addedTabs = indentedBlock.length - selectedBlock.length;
+
+                this.value = text.substring(0, lineStart) + indentedBlock + text.substring(lineEnd);
+                this.selectionStart = s + 1;
+                this.selectionEnd = e + addedTabs;
+            }
+        } else {
+            this.value = text.substring(0, s) + '\t' + text.substring(e);
+            this.selectionStart = this.selectionEnd = s + 1;
+        }
     }
 };
 
