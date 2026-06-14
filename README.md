@@ -1,6 +1,7 @@
 # Browserpad
 
 Browserpad is a notepad in the browser - a private place for quick notes.
+The source code is based on [browserpad.org](https://github.com/Browserpad/browserpad).
 
 ## Screenshot
 
