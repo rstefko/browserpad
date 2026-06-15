@@ -16,6 +16,27 @@ window.beforeunload = storeLocally;
 // Allow inputting tabs in the textarea instead of changing focus to the next element
 // (must use onkeydown to prevent default behavior of moving focus)
 textbox.onkeydown = function (event) {
+    // Bullet list support
+    if (event.key === "Enter" && this.selectionStart === this.selectionEnd) {
+        var enterText = this.value;
+        var enterPos = this.selectionStart;
+        var currentLineStart = enterText.lastIndexOf('\n', enterPos - 1) + 1;
+        var currentLineEnd = enterText.indexOf('\n', enterPos);
+        if (currentLineEnd === -1) {
+            currentLineEnd = enterText.length;
+        }
+
+        var currentLine = enterText.substring(currentLineStart, currentLineEnd);
+        var bulletMatch = currentLine.match(/^([-*]\s+)/);
+        if (bulletMatch) {
+            event.preventDefault();
+            var bulletPrefix = bulletMatch[1];
+            this.value = enterText.substring(0, enterPos) + '\n' + bulletPrefix + enterText.substring(enterPos);
+            this.selectionStart = this.selectionEnd = enterPos + 1 + bulletPrefix.length;
+            return;
+        }
+    }
+
     if (event.key === "Tab") {
         event.preventDefault();
         var text = this.value, s = this.selectionStart, e = this.selectionEnd;
