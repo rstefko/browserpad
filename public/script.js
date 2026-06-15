@@ -27,7 +27,7 @@ textbox.onkeydown = function (event) {
         }
 
         var currentLine = enterText.substring(currentLineStart, currentLineEnd);
-        var bulletMatch = currentLine.match(/^([-*]\s+)/);
+        var bulletMatch = currentLine.match(/^(\s*[-*]\s+)/);
         if (bulletMatch) {
             event.preventDefault();
             var bulletPrefix = bulletMatch[1];
