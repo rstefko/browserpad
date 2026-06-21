@@ -31,6 +31,15 @@ textbox.onkeydown = function (event) {
         if (bulletMatch) {
             event.preventDefault();
             var bulletPrefix = bulletMatch[1];
+
+            // End list when Enter is pressed on an empty bullet item
+            var bulletContent = currentLine.substring(bulletPrefix.length);
+            if (bulletContent.trim() === '') {
+                this.value = enterText.substring(0, currentLineStart) + enterText.substring(currentLineEnd);
+                this.selectionStart = this.selectionEnd = currentLineStart;
+                return;
+            }
+
             this.value = enterText.substring(0, enterPos) + '\n' + bulletPrefix + enterText.substring(enterPos);
             this.selectionStart = this.selectionEnd = enterPos + 1 + bulletPrefix.length;
             return;
