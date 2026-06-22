@@ -49,6 +49,13 @@ textbox.onkeydown = function (event) {
     if (event.key === "Tab") {
         event.preventDefault();
         var text = this.value, s = this.selectionStart, e = this.selectionEnd;
+        var currentLineStart = text.lastIndexOf('\n', s - 1) + 1;
+        var currentLineEnd = text.indexOf('\n', s);
+        if (currentLineEnd === -1) {
+            currentLineEnd = text.length;
+        }
+        var currentLine = text.substring(currentLineStart, currentLineEnd);
+        var isBulletLine = /^\s*[-*]\s+/.test(currentLine);
 
         if (s !== e) {
             var lineStart = text.lastIndexOf('\n', s - 1) + 1;
@@ -74,6 +81,17 @@ textbox.onkeydown = function (event) {
                 this.value = text.substring(0, lineStart) + indentedBlock + text.substring(lineEnd);
                 this.selectionStart = s + 1;
                 this.selectionEnd = e + addedTabs;
+            }
+        } else if (isBulletLine) {
+            if (event.shiftKey) {
+                var outdentedLine = currentLine.replace(/^(\t| {1,2})/, '');
+                var removed = currentLine.length - outdentedLine.length;
+
+                this.value = text.substring(0, currentLineStart) + outdentedLine + text.substring(currentLineEnd);
+                this.selectionStart = this.selectionEnd = Math.max(currentLineStart, s - removed);
+            } else {
+                this.value = text.substring(0, currentLineStart) + '\t' + currentLine + text.substring(currentLineEnd);
+                this.selectionStart = this.selectionEnd = s + 1;
             }
         } else {
             this.value = text.substring(0, s) + '\t' + text.substring(e);
