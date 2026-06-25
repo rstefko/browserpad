@@ -157,7 +157,7 @@ function selectFindResult(matches, index) {
     // Scroll textarea so the selected match is visible
     var beforeMatch = textbox.value.substring(0, start);
     var lineIndex = beforeMatch.split('\n').length - 1;
-    textbox.scrollTop = Math.max(0, (lineIndex - 5) * 14);
+    textbox.scrollTop = Math.max(0, (lineIndex - 1) * 14);
     updateFindStatus(index + 1, matches.length);
 }
 
